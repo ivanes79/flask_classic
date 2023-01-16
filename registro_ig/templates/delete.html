@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block section %} 
+<h1>BORRAR REGISTRO</h1>
+
+<article>
+<p>fecha : {{data[1]}}</p>
+<p>concepto : {{data[2]}}</p>
+<p>cantidad : {{data[3]}}</p>
+</article>
+
+<form action="/delete/{{data[0]}}" method="post">
+    <button type="submit" style="background-color: #e91e63">Borrar Registro</button>
+{% endblock %}
