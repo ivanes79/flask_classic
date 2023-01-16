@@ -1,14 +1,14 @@
 import sqlite3
 from config import *
+from registro_ig.conexion import Conexion
 
 def select_all():
-    con = sqlite3.connect(ORIGIN_DATA)
-    cur = con.cursor()
+    connect = Conexion("select id,date,concept,quantity from movements order by date;")
 
-    res = cur.execute("select id,date,concept,quantity from movements order by date;")
+   
 
-    filas = res.fetchall()#capturo las filas de datos
-    columnas= res.description#capturo los nombres de columnas
+    filas = connect.res.fetchall()#capturo las filas de datos
+    columnas= connect.res.description#capturo los nombres de columnas
 
     #objetivo crear una lista de diccionario con filas y columnas
 
@@ -25,38 +25,30 @@ def select_all():
         resultado.append(dato)
 
 
-    con.close()
+    connect.con.close()
     return resultado
 
 def insert(registro):
+    connectInsert = Conexion("insert into movements(date,concept,quantity) values(?,?,?)",registro)
 
-    con = sqlite3.connect(ORIGIN_DATA)
-    cur = con.cursor()
+   
 
-    cur.execute("insert into movements(date,concept,quantity) values(?,?,?)",registro)
+    connectInsert.con.commit() #funcion que registra en la base de datos finalmente
 
-    con.commit() #funcion que registra en la base de datos finalmente
-
-    con.close()
+    connectInsert.con.close()
 
 def select_by(id):
-    con = sqlite3.connect(ORIGIN_DATA)
-    cur = con.cursor()
 
-    res = cur.execute(f"select id,date,concept,quantity from movements WHERE id={id};")
-
-    resultado = res.fetchall()
+    connectSelectby = Conexion(f"select id,date,concept,quantity from movements WHERE id={id};")
+  
+    resultado = connectSelectby.res.fetchall()
+    connectSelectby.con.close()
 
     return resultado[0]
     
-
-
 def delete_by(id):
-    con = sqlite3.connect(ORIGIN_DATA)
-    cur = con.cursor()
+    connectDeleteby = Conexion(f"DELETE FROM movements WHERE id = {id}")
 
-    cur.execute(f"DELETE FROM movements WHERE id = {id}")
-
-    con.commit()
-    con.close()
+    connectDeleteby.con.commit()
+    connectDeleteby.con.close()
 

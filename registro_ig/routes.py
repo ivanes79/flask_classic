@@ -1,7 +1,8 @@
 from registro_ig import app
-from flask import render_template,request,redirect,url_for
+from flask import render_template,request,redirect,url_for,flash
 from registro_ig.models import select_all,insert,select_by,delete_by
 from datetime import date
+from registro_ig.forms import MovementsForm
 
 def validateForm(requestForm):
     hoy = date.today().isoformat()
@@ -31,9 +32,28 @@ def index():
 
 @app.route("/new",methods=["GET","POST"])
 def create():
-
+    form = MovementsForm()
     if request.method == "GET":
-        return render_template("new.html",dataForm=None)
+        return render_template("new.html",dataForm=form)
+    else:
+        #como recibo los datos del formulario
+        errores = validateForm(request.form)
+
+        if form.validate_on_submit():
+           
+            insert( [form.date.data.isoformat(),
+                     form.concept.data,
+                     form.quantity.data])
+            flash("registro correcto")
+            return redirect(url_for('index'))
+        else:    
+            return render_template("new.html",msgError={},dataForm=form)
+            
+
+    '''
+    asi estaba antes del flask
+    if request.method == "GET":
+        return render_template("new.html",dataForm={})
     else:
         #como recibo los datos del formulario
         errores = validateForm(request.form)
@@ -46,7 +66,7 @@ def create():
                      request.form['quantity']  ])
             
             return redirect(url_for('index'))
-
+    '''
 @app.route("/delete/<int:id>",methods=["GET","POST"]) 
 def remove(id):
 
@@ -55,4 +75,5 @@ def remove(id):
         return render_template("delete.html",data=resultado)   
     else:
         delete_by(id)
+        flash("registro eliminado correctamente")
         return redirect(url_for('index'))
